@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student information</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 20px;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      .container {
+        width: 90%;
+        margin: 20px auto;
+        border: 2px solid #000;
+        padding: 20px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .header img {
+        width: 180px;
+        height: auto;
+      }
+      .header-info {
+        flex-grow: 1;
+        padding-left: 20px;
+      }
+      .header-info p {
+        margin: 20px 0;
+      }
+      .header-info p strong {
+        display: inline-block;
+        width: 150px;
+      }
+      .header .right {
+        text-align: right;
+        padding-top: 15px;
+        align-self: flex-start;
+      }
+      .header .right p {
+        white-space: nowrap;
+        margin-top: 5px;
+        margin-right: 0px;
+        margin-bottom: px;
+        margin-left: 0px;
+      }
+      h2 {
+        text-align: center;
+        border: 2px solid #000;
+        padding: 10px;
+        margin-top: 0;
+        margin-bottom: 20px;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 20px;
+      }
+      .footer button {
+        margin: 0 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+      #editForm {
+        display: none;
+        border: 2px solid #000;
+        padding: 20px;
+        margin-top: 20px;
+      }
+      #editForm input, #editForm button, #editForm select {
+        margin: 10px 0;
+        padding: 10px;
+        width: calc(100% - 22px);
+        font-size: 16px;
+      }
+    </style>
+
+    <script>
+      function fetchData() {
+        google.script.run.withSuccessHandler(updateUI).getData();
+      }
+
+      function updateUI(data) {
+        document.getElementById('name').innerText = data.name;
+        document.getElementById('dob').innerText = data.dob;
+        document.getElementById('center').innerText = data.center;
+        document.getElementById('grade').innerText = data.grade;
+        document.getElementById('parentName').innerText = data.parentName;
+        document.getElementById('phone').innerText = data.phone;
+        document.getElementById('info').innerText = data.info;
+        document.getElementById('image').src = data.image;
+      }
+
+      function printPage() {
+        window.print();
+      }
+
+      function showEditForm() {
+        document.getElementById('editForm').style.display = 'block';
+        document.getElementById('nameEdit').value = document.getElementById('name').innerText;
+        document.getElementById('dobEdit').value = document.getElementById('dob').innerText;
+        document.getElementById('centerEdit').value = document.getElementById('center').innerText;
+        document.getElementById('gradeEdit').value = document.getElementById('grade').innerText;
+        document.getElementById('parentNameEdit').value = document.getElementById('parentName').innerText;
+        document.getElementById('phoneEdit').value = document.getElementById('phone').innerText;
+        document.getElementById('infoEdit').value = document.getElementById('info').innerText;
+        document.getElementById('imageEdit').value = document.getElementById('image').src;
+      }
+
+      function extractFileId(url) {
+        var regex = /\/d\/([a-zA-Z0-9-_]+)\//;
+        var match = url.match(regex);
+        return match ? match[1] : null;
+      }
+
+      function submitEditForm() {
+        var imageInput = document.getElementById('imageEdit').value;
+        var imageFileId = extractFileId(imageInput);
+        var imageUrl = imageFileId ? "https://lh3.googleusercontent.com/d/" + imageFileId + "?authuser=0" : imageInput;
+
+        var data = {
+          name: document.getElementById('nameEdit').value,
+          dob: document.getElementById('dobEdit').value,
+          center: document.getElementById('centerEdit').value,
+          grade: document.getElementById('gradeEdit').value,
+          parentName: document.getElementById('parentNameEdit').value,
+          phone: document.getElementById('phoneEdit').value,
+          info: document.getElementById('infoEdit').value,
+          image: imageUrl,
+        };
+
+        google.script.run.withSuccessHandler(fetchData).updateData(data);
+        document.getElementById('editForm').style.display = 'none';
+      }
+
+    </script>
+  </head>
+
+  <body onload="fetchData()">
+    <div class="container">
+      <div class="header">
+        <img id="image" alt="Student Image">
+
+        <div class="header-info">
+          <p><strong>School:</strong> <span id="center"></span></p>
+          <p><strong>Full name:</strong> <span id="name"></span></p>
+          <p><strong>Date of birth:</strong> <span id="dob"></span></p>
+          <p><strong>Phone number:</strong> <span id="phone"></span></p>
+          <p><strong>Information:</strong> <span id="info"></span></p>
+        </div>
+
+        <div class="right">
+          <p><strong>Class:</strong> <span id="grade"></span></p>
+          <p>&nbsp;<span></span></p>
+          <p>&nbsp;<span></span></p>
+          <p><strong>Parents:</strong> <span id="parentName"></span></p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <button type="button" onclick="printPage()">Print</button>
+        <button type="button" onclick="showEditForm()">Edit</button>
+      </div>
+
+      <div id="editForm">
+        <input type="text" id="nameEdit" placeholder="Full name">
+        <input type="text" id="dobEdit" placeholder="Date of birth">
+        <input type="text" id="centerEdit" placeholder="School">
+        <input type="text" id="gradeEdit" placeholder="Class">
+        <input type="text" id="parentNameEdit" placeholder="Parents">
+        <input type="text" id="phoneEdit" placeholder="Phone number">
+        <input type="text" id="infoEdit" placeholder="Information">
+        <input type="text" id="imageEdit" placeholder="Photo">
+        <button type="button" onclick="submitEditForm()">Submit</button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <form id="myForm">
+      <label for="name"><strong>Full name:</strong></label>
+      <input type="text" id="name" name="name" required><br><br>
+
+      <label for="dob"><strong>Date of birth:</strong></label>
+      <input type="date" id="dob" name="dob" required><br><br>
+
+      <label for="center"><strong>School:</strong></label>
+      <input type="text" id="center" name="center" required><br><br>
+
+      <label for="grade"><strong>Class:</strong></label>
+      <input type="text" id="grade" name="grade" required><br><br>
+
+      <label for="parentName"><strong>Parents:</strong></label>
+      <input type="text" id="parentName" name="parentName" required><br><br>
+
+      <label for="phone"><strong>Phone number:</strong></label>
+      <input type="tel" id="phone" name="phone" required><br><br>
+
+      <label for="info"><strong>Information:</strong></label>
+      <textarea id="info" name="info"></textarea><br><br>
+
+      <label for="image"><strong>Image URL (Note: The image link is copied from Google Drive and has been set to "Anyone with the link is Viewer):</strong></label>
+      <input type="url" id="image" name="image"><br><br>
+      
+      <input type="button" value="Xác nhận" onclick="submitForm()">
+    </form>
+    <script>
+      function extractFileId(url) {
+        const regex = /\/d\/(.*?)\/view/;
+        const matches = url.match(regex);
+        return matches ? matches[1] : '';
+      }
+
+      function formatDate(date) {
+        if (date === "") {
+          return "";
+        } else {
+          const [year, month, day] = date.split('-');
+          return `${day}/${month}/${year}`;
+        }
+      }
+
+      function submitForm() {
+        const form = document.getElementById('myForm');
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+          if (key === 'dob') {
+            value = formatDate(value);
+          } else if (key === 'image') {
+            value = "https://lh3.googleusercontent.com/d/" + extractFileId(value) + "?authuser=0";
+          }
+          data[key] = value;
+        });
+        google.script.run.withSuccessHandler(closeForm).saveData(data);
+      }
+      function closeForm() {
+        google.script.host.close();
+      }
+    </script>
+  </body>
+</html>
